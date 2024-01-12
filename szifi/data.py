@@ -117,6 +117,20 @@ class input_data:
 
                 self.data["coupling_matrix_name"][field_id] = path + "data/apod_smooth_1024.fits"
 
+        elif params_data["data_set"] == "act-dr5_sims":
+            print(">>> doing act-dr5-sims")
+
+            self.nside_tile = 8
+            self.n_tile = hp.nside2npix(self.nside_tile)
+
+            self.nx = 4096 #number of pixels per dimension
+            self.l = 14.8  #field size in deg
+            self.dx_arcmin = self.l/self.nx*60. #pixel size in arcmin
+            self.dx = self.dx_arcmin/180./60.*np.pi
+            self.pix = pixel(self.nx,self.dx)
+
+            print(">>> using nside_tile",self.nside_tile)
+            print(">>> using nx",self.nx)
 
             #Experiment specifications
 
