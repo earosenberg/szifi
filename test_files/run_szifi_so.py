@@ -17,14 +17,25 @@ def main():
     #method = 'sht20k'
     method = 'spline'
 
-    cat_fn = f'tile273_lmax{lmax1d}_{method}_cat.pkl'
+    #cat_fn = f'tile273_lmax{lmax1d}_{method}_cat.pkl'
+    cat_fn=f'so_cat_F.pkl'
     bin_fac=4
     params_szifi["powspec_lmax1d"] = lmax1d
     params_szifi["powspec_bin_fac"] = bin_fac
+    params_szifi["theta_500_vec_arcmin"] = np.exp(np.linspace(np.log(0.5),np.log(15.),10)) #cluster search angular scales
+    #params_szifi["theta_500_vec_arcmin"] = np.array([1.8190403])
+    #params_szifi["theta_500_vec_arcmin"] = np.array([15.])
+    params_szifi["path_template"] = "/mirror/scratch/erosen/data/so_sims/tem/x"
+
+    params_szifi['save_snr_maps']=True
+    params_szifi['snr_maps_path'] = "snr_maps"
+    params_szifi['snr_maps_name'] = 'snr'
+    params_szifi['n_inpaint'] = 500
+    params_szifi['lsep'] = 0
     #Input data
     # params_szifi['compute_coupling_matrix'] = True
     # params_szifi['save_coupling_matrix'] = True
-    params_data["field_ids"] = [273]
+    params_data["field_ids"] = [598]
     data = szifi.input_data(params_szifi=params_szifi,params_data=params_data)
 
     #Find clusters
@@ -47,8 +58,8 @@ def main():
 
     q_th_final = 5.
 
-    catalogue_obs_noit = szifi.get_catalogue_q_th(catalogue_obs_noit,q_th_final)
-    catalogue_obs_it = szifi.get_catalogue_q_th(catalogue_obs_it,q_th_final)
+    # catalogue_obs_noit = szifi.get_catalogue_q_th(catalogue_obs_noit,q_th_final)
+    # catalogue_obs_it = szifi.get_catalogue_q_th(catalogue_obs_it,q_th_final)
 
     #Merge catalogues of all fields
 
@@ -57,9 +68,9 @@ def main():
     catalogue_obs_noit = szifi.merge_detections(catalogue_obs_noit,radius_arcmin=radius_arcmin,return_merge_flag=True,mode="fof")
     catalogue_obs_it = szifi.merge_detections(catalogue_obs_it,radius_arcmin=radius_arcmin,return_merge_flag=True,mode="fof")
 
-    # import pickle
-    # with open(cat_fn, 'wb') as fil:
-    #     pickle.dump([catalogue_obs_noit, catalogue_obs_it], fil)
+    import pickle
+    with open(cat_fn, 'wb') as fil:
+        pickle.dump([catalogue_obs_noit, catalogue_obs_it], fil)
 
 main()
 # #Some plots

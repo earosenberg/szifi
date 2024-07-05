@@ -1260,6 +1260,42 @@ def diffusive_inpaint_freq(tmap,mask,n_inpaint):
 
     return ret
 
+
+@jit
+def diffusive_inpaint_new(image, mask, n_inpaint):
+    inpainted_image = image.copy()
+    nx = image.shape[0]
+    rolls = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+    zeros = np.where(mask == 0)
+    x_0 = zeros[0]
+    y_0 = zeros[1]
+    for i in range(0, len(x_0), 1):
+        inpainted_image[x_0[i], y_0[i]] = np.nan
+
+    ip = inpainted_image.copy()
+    for j in range(0, n_inpaint, 1):
+        for i in range(0, len(x_0), 1):
+            x = x_0[i]
+            y = y_0[i]
+            c = 0
+            value = 0.
+            for delta_x, delta_y in rolls:
+                if (nx > x+delta_x  >= 0) and (nx > y+delta_y >= 0):
+                    ival = inpainted_image[x+delta_x, y+delta_y]
+                    if not np.isnan(ival):
+                        value += ival
+                        c += 1
+            if c > 0:
+                ip[x,y] = value/c
+
+        for i in range(0, len(x_0), 1):
+            inpainted_image[x_0[i],y_0[i]] = ip[x_0[i],y_0[i]]                
+
+    nans = np.where(np.isnan(inpainted_image))
+    for ii in range(0, len(nans[0])):
+        inpainted_image[nans[0][ii], nans[1][ii]] = 0        
+    return inpainted_image
+
 @jit
 def diffusive_inpaint(image,mask,n_inpaint):
 
